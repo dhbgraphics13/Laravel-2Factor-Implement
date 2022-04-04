@@ -4,6 +4,7 @@ namespace App\Models;
 
 
 use App\Mail\TwoFactorOtp;
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,7 +12,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Exception;
 
@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role','active','username','email_verified_at','two_factor'
     ];
 
 
@@ -37,11 +38,47 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    const ADMIN_TYPE ='A'; //admin
+    const MANAGER_TYPE ='M'; //Manager
+    const DESIGNER_TYPE ='D'; //Designer
+    const PRINT_MAN_TYPE ='P'; //Print man
+    const USER_TYPE ='U'; //user
+
+    public function isAdmin(){
+        return $this->role == self::ADMIN_TYPE;
+    }
+
+    public function isManager(){
+        return $this->role == self::MANAGER_TYPE;
+    }
+    public function isDesigner(){
+        return $this->role == self::DESIGNER_TYPE;
+    }
+
+    public function isPrintMan(){
+        return $this->role  == self::PRINT_MAN_TYPE;
+    }
+
+    public function isUser(){
+        return $this->role  == self::USER_TYPE;
+    }
+
+    public function store($inputs, $id = null)
+    {
+        if($id)
+        {
+            $users = $this->findOrFail($id);
+            return $users->update($inputs);
+        } else {
+            return $this->create($inputs)->id;
+        }
+    }
+
+
+
     public function generateCode()
     {
-
         $code = encrypt(rand(1000000, 9999));
-
 
         TwoFactor::updateOrCreate(
             [ 'user_id' => Auth::user()->id ],
@@ -63,5 +100,20 @@ class User extends Authenticatable
     }
 
 
+    public function designerOptions()
+    {
+        $data = [ null => '-- Select --'];
+        $result = $this->where('role','D')->pluck('name', 'id')->sort();
+        if($result->count() > 0) {
+            $data = $data + $result->toArray();
+        }
+        return $data;
+    }
+
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
 }

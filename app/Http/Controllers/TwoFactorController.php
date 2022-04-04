@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\TwoFactor;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -38,11 +40,18 @@ class TwoFactorController extends Controller
 
         if (!is_null($find)) {
             Session::put('user_2fa', auth()->user()->id);
+            User::updateOrCreate(
+                [ 'id' => Auth::user()->id ],
+                [ 'email_verified_at' => Carbon::now()->timestamp]
+            );
+
             return redirect()->route('home');
         }
 
         return back()->with('error', 'You entered wrong code.');
     }
+
+
 
     public function resend()
     {

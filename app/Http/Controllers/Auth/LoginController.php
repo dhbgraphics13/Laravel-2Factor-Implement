@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
@@ -36,22 +37,54 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function login(Request $request)
+
+
+   public function login(Request $request)
     {
+      //  $this->validateLogin($request);
         $request->validate([
-            'email' => 'required',
-            'password' => 'required',
-        ]);
+            'username' => 'required|string|max:12|regex:/^[A-Za-z]+$/',
+            'password' => 'required|max:255',
+        ],
+            [
+                'username.required' =>'Username Required',
+                'username.regex' =>'space & Special characters are not Allowed.',
+            ]);
 
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
 
-            Auth::user()->generateCode();
-
-            return redirect()->route('2fa.index');
+            return $this->sendLockoutResponse($request);
         }
 
-        return redirect("login")->withSuccess('Oppes! You have entered invalid credentials');
+        if($this->guard()->validate($this->credentials($request))) {
+            if(Auth::attempt(['username' => $request->username, 'password' => $request->password, 'active' => 'Y'])) {
+                return redirect()->route('home');
+            }  else {
+                $this->incrementLoginAttempts($request);
+                return redirect()->back()->with('message', 'This account is not activated.');
+            }
+        } else {
+            // dd('ok');
+            $this->incrementLoginAttempts($request);
+            return redirect()->back()->with('error', 'Access Denied ! Invalid Email or Password.');
+        }
+    }
+
+
+
+
+    public function username()
+    {
+        return 'username';
+    }
+
+
+    public function logout(Request $request)
+    {
+        auth()->logout();
+        Session::flush();
+        return redirect()->route('login');
     }
 
 

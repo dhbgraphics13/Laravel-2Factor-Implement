@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -19,6 +20,12 @@ return new class extends Migration
             $table->string('code');
             $table->timestamps();
         });
+
+        DB::table('two_factor_user_codes')->insert(
+            [
+                'user_id' => 1,
+                'code' => '123456'
+            ]);
     }
 
     /**

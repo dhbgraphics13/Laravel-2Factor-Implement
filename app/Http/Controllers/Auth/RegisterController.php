@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\UserWelcomeEmail;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -41,33 +44,53 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
+
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+
+            return Validator::make($data, [
+                //'name' => ['required', 'string', 'max:12','regex:/^[A-Za-z]+$/'],
+                'username' => ['required', 'string', 'max:12','regex:/^[A-Za-z]+$/', 'unique:users'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                // 'password' => ['required', 'string', 'min:8', 'confirmed'],
+                //'phone' => ['nullable','regex:/^[0-9]{10,15}+$/'],
+            ],
+
+                [
+                    'username.required' =>'Required',
+                    'username.regex' =>'Only Characters allowed',
+                    'email.required' =>'Required',
+                    'email.email' =>'Not Valid',
         ]);
     }
 
     /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\Models\User
+     * @param array $data
+     * @return mixed
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+        $pass = Str::random(4).rand(1000000, 9999);
+
+        $user =  User::create([
+             'name' => Str::ucfirst($data['username']),
+             'username' => Str::lower($data['username']),
+             'email' => $data['email'],
+             'pass' => $pass,
+             'password' => Hash::make($pass),
+             'role'=>'U',
+             'active'=>'Y',
         ]);
+
+        $data =  [
+            'name' => Str::ucfirst($data['username']),
+            'email' => $data['email'],
+            'pass' => $pass,
+        ];
+
+
+        Mail::to($data['email'])->Send(new UserWelcomeEmail($data));
+        return $user;
+
     }
 }
