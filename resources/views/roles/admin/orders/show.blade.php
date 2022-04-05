@@ -162,7 +162,136 @@
 
         @auth
           @if(Auth::User()->isadmin() || Auth::User()->isDesigner())
-              @include('roles.admin.orders.order_chat_window')
+                <div class="round hollow text-center">
+                    <a href="#" id="popup" ><span class="glyphicon glyphicon-comment"></span> Open in chat </a>
+                </div>
+
+                <div class=" popupchat popup-box chat-popup shedow">
+                    <div class="popup-head">
+                        {{'Order # ' .$order->id }} Live Chat
+                    </div>
+
+                    <div class="popup-messages scrollable-element">
+                        <div class="btn-footer">
+
+
+                            <div class="conversation" >
+
+                                {!! $contents !!}
+
+                            </div>  <!-- use for icon 1 -->
+                            <div id="end"></div>
+                        </div>  <!--end of <div class="btn-footer"> -->
+                        <div class="popup-messages-footer pt-2">
+                            {!! Form::open([
+                                                          'route'        => 'order.chat',
+                                                          'method'       => 'POST',
+                                                          'autocomplete' => 'on',
+                                                          'id'           => 'ajax-chat-form',
+                                                          'files'        => 'true',
+                                                          'redirectTo'   => route('home'),
+                                                          ]) !!}
+
+                            <textarea name="text" class="form-control"  placeholder="Type a message..."  rows="2"  id="txt"></textarea>
+                            <input name="order_id" type="hidden" value="{{ $order->id }}">
+                            <div class="btn-footer">
+                                {{-- <button class="bg_none"><i class="glyphicon glyphicon-film"></i> </button>
+                                 <button class="bg_none"><i class="glyphicon glyphicon-camera"></i> </button>
+                                 <button class="bg_none"><i class="glyphicon glyphicon-paperclip"></i> </button>--}}
+                                <button class="bg_none pull-right" type="submit" id="myBtn"><i class="fa fa-telegram" aria-hidden="true"></i> </button>
+                                {{ Form::close() }}
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+
+
+                            $('#ajax-chat-form').on('submit', function(event) {
+                                event.preventDefault();
+                                //$(".btn-hsk").html("Sending please wait... <i class=\"fa fa-cog fa-spin fa-ax fa-fw\"></i>");
+                                //$(".btn-hsk").addClass('disable');
+
+                                var formData = $(this).serialize(); // form data as string
+                                var formAction = $(this).attr('action'); // form handler url
+                                var formMethod = $(this).attr('method'); // GET, POST
+                                var redirectTo  = $(this).attr('redirectTo'); // GET, POST
+
+                                $.ajaxSetup({
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    }
+                                });
+
+                                $.ajax({
+                                    url: formAction,
+                                    method: formMethod,
+                                    cache: false,
+                                    data:new FormData(this),
+                                    dataType:'JSON',
+                                    contentType: false,
+                                    processData: false,
+                                    success: function(data) {
+                                        if($.isEmptyObject(data.error)){
+
+                                            var html = data.options;
+                                            $("#txt").val("");
+
+                                            $('.conversation').html(html);
+                                            $('.scrollable-element').animate({
+                                                scrollTop: $("#end").offset().top
+                                            }, 500);
+
+                                        }
+                                        else{
+
+                                        }
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+
+
+                    <script>
+
+
+                        $(document).ready(function() {
+                            var _token = $("input[name='_token']").val();
+                            var order_id = {{$order->id}};
+                            var interval = 15000;
+                            function doAjax() {
+                                $.ajax({
+                                    type: "POST",
+                                    url: '{{ route('sync.chat') }}',
+                                    data: {_token: _token,order_id: order_id},
+                                    success: function (data)
+                                    {
+                                        var html = data.options;
+                                        $('.conversation').html(html);
+                                        $('.scrollable-element').animate({
+                                            scrollTop: $("#end").offset().top
+                                        }, 500);
+
+                                    },
+                                    complete: function (data) {
+                                        // Schedule the next
+
+                                        setTimeout(doAjax, interval);
+
+                                    }
+                                });
+                            }
+                            setTimeout(doAjax, interval);
+                        });
+
+                    </script>
     @endif
        @endauth
 

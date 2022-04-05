@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Chat;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\User;
@@ -96,9 +97,13 @@ class OrderController extends Controller
     public function show($orderID)
     {
         $order = Order::findOrFail($orderID);
+        $chats = Chat::where('order_id',$orderID)->orderBy('id','asc')->get();
+        $view = View::make('chat.chat_inner', ['chats' => $chats]);
+        $contents = $view->render();
+
         $designerOptions = (new User)->designerOptions();
         $categoryOptions = (new Category)->categoryOptions();
-        return view('roles.admin.orders.show',compact('designerOptions','categoryOptions','order'));
+        return view('roles.admin.orders.show',compact('designerOptions','categoryOptions','order','contents'));
     }
 
 

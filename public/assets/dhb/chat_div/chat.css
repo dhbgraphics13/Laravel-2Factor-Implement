@@ -10,6 +10,7 @@
     right: 25px;
     width: 300px;
     font-family: 'Open Sans', sans-serif;
+    /*z-index: 99;*/
 }
 .round.hollow {
     /*margin: 40px 0 0;*/
@@ -18,6 +19,8 @@
     right: 70px;
     bottom: 0;
     margin-bottom: 20px;
+    background: #fff;
+    z-index: 99;
 }
 .round.hollow a {
     border: 2px solid #ff6701;
@@ -28,6 +31,7 @@
     padding: 10px 21px;
     text-decoration: none;
     font-family: 'Open Sans', sans-serif;
+    z-index: 99;
 }
 .round.hollow a:hover {
     border: 2px solid #000;
@@ -413,7 +417,7 @@
 
 .conversation .me .username{
     font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
     margin-bottom: 4px;
     background-color: #fff;
     padding: 8px;
@@ -436,7 +440,7 @@
 }
 .conversation .you .username{
     font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
     margin-bottom: 4px;
     background-color: #f1d2d2;
     padding: 8px;
@@ -449,4 +453,18 @@
     padding: 8px;
     border-radius: 14px;
     width: 100%;
+}
+.you .user_text .timestemp{
+     float: right;
+    font-weight: normal;
+    font-size:8px;
+    margin-top:2px;
+    padding: 5px;
+}
+.me .user_text .timestemp{
+    float: right;
+    font-weight: normal;
+    font-size:8px;
+    margin-top:2px;
+    padding: 8px;
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PrintingModuleController;
@@ -36,10 +37,10 @@ Route::group([ 'middleware' =>  ['auth' , '2fa' ]], function() {
     Route::post('order/printable-file-upload/{orderId}', [OrderController::class,'orderDocumentUpload'])->name('order.printable.file.upload');
     Route::post('get-cdr-file-upload-form', [OrderController::class,'getFileUploadFormByOrderId'])->name('get.file.upload.form_by.order.id');
     Route::post('submit/order-print-by', [OrderController::class,'orderPrintBy'])->name('order.print.by');
-
     Route::post('file/delete', [OrderController::class,'orderFileDelete'])->name('order.file.delete'); //admin and designer both are perfom same action
 
-
+    Route::post('order/chat', [ChatController::class,'store'])->name('order.chat');
+    Route::post('order/sync-chat', [ChatController::class,'syncChat'])->name('sync.chat');
 });
 
 Route::group([ 'middleware' =>  ['is_admin','auth' , '2fa' ]], function() {

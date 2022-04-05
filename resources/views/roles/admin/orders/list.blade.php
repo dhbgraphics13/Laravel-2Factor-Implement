@@ -55,17 +55,24 @@
                                         <td>{{dateHuman($order->created_at)}}</td>
                                         <td>
                                             {{ Form::select('status',OrderStatusOptions(),$order->status, ['id' => $order->id,'class'=>'status']) }}
+                                            @if($order->printed_by)
+                                                <br>
+                                                <span class="badge badge-success">{!! $order->printed_by !!}</span>
+                                                @endif
                                         </td>
                                         <td>
-                                          @if($order->status==2)
+
                                                 @if($order->file)
                                                     <a target="_blank" href="{{ asset('uploads/order_documents/'.$order->file) }}" >Download</a>
                                                     <span class="bedge bedge-danger  file_remove" id="{{ $order->id }}" ><i class="fa fa-times text-danger " style="padding-left: 15px;"></i></span>
-                                                @else
+                                                 @else
+                                                @if($order->status==2)
+                                                @if($order->file==null)
                                                     <button type="button" class="badge badge-primary"  id="{{$order->id}}">Upload File</button>
                                                 @endif
-                                            @else
-                                                <p>---</p>
+                                                @else
+                                                    <p>----</p>
+                                                    @endif
                                               @endif
                                         </td>
                                         <td>

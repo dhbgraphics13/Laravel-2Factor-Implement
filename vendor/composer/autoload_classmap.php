@@ -44,6 +44,7 @@ return array(
     'App\\Mail\\UserWelcomeEmail' => $baseDir . '/app/Mail/UserWelcomeEmail.php',
     'App\\Models\\Category' => $baseDir . '/app/Models/Category.php',
     'App\\Models\\CategoryView' => $baseDir . '/app/Models/CategoryView.php',
+    'App\\Models\\Chat' => $baseDir . '/app/Models/Chat.php',
     'App\\Models\\Order' => $baseDir . '/app/Models/Order.php',
     'App\\Models\\OrderDetail' => $baseDir . '/app/Models/OrderDetail.php',
     'App\\Models\\PrintableModuleView' => $baseDir . '/app/Models/PrintableModuleView.php',

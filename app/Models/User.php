@@ -116,4 +116,11 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+
+    public function chats()
+    {
+        return $this->hasMany(Chat::class);
+    }
+
+
 }
